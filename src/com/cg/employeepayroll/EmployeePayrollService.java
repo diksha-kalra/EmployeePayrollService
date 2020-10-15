@@ -45,4 +45,11 @@ public class EmployeePayrollService {
 			new EmployeePayrollFileIOService().printData();
 		}
 	}
+
+	public long countEntries(IOService fileIo) {
+		if (fileIo.equals(IOService.FILE_IO)) {
+			return new EmployeePayrollFileIOService().countEntries();
+		}
+		return 0;
+	}
 }
