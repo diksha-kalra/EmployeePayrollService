@@ -3,8 +3,10 @@ package com.cg.employeepayroll;
 import java.util.*;
 
 public class EmployeePayrollService {
-	public enum IOService{CONSOLE_IO,FILE_IO,DB_IO,REST_IO}
-	
+	public enum IOService {
+		CONSOLE_IO, FILE_IO, DB_IO, REST_IO
+	}
+
 	private List<EmployeePayrollData> employeePayrollList;
 
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
@@ -22,9 +24,9 @@ public class EmployeePayrollService {
 	}
 
 	public void writeEmployeePayrollData(IOService ioService) {
-		if(ioService.equals(IOService.CONSOLE_IO))
+		if (ioService.equals(IOService.CONSOLE_IO))
 			System.out.println("Employee Payroll Data " + employeePayrollList);
-		else if(ioService.equals(IOService.FILE_IO)) {
+		else if (ioService.equals(IOService.FILE_IO)) {
 			new EmployeePayrollFileIOService().writeData(employeePayrollList);
 		}
 	}
@@ -37,5 +39,10 @@ public class EmployeePayrollService {
 		employeePayroll.readEmployeePayrollData(consoleInputReader);
 		employeePayroll.writeEmployeePayrollData(IOService.CONSOLE_IO);
 	}
-}
 
+	public void printData(IOService fileIo) {
+		if (fileIo.equals(IOService.FILE_IO)) {
+			new EmployeePayrollFileIOService().printData();
+		}
+	}
+}
