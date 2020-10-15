@@ -1,5 +1,7 @@
 package com.cg.employeepayroll;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.*;
 
 public class EmployeePayrollService {
@@ -11,6 +13,9 @@ public class EmployeePayrollService {
 
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
 		this.employeePayrollList = employeePayrollList;
+	}
+
+	public EmployeePayrollService() {
 	}
 
 	private void readEmployeePayrollData(Scanner consoleInputReader) {
@@ -51,5 +56,11 @@ public class EmployeePayrollService {
 			return new EmployeePayrollFileIOService().countEntries();
 		}
 		return 0;
+	}
+	
+	public List<EmployeePayrollData> readPayrollData(IOService ioService) {
+		if (ioService.equals(IOService.FILE_IO))
+			this.employeePayrollList = new EmployeePayrollFileIOService().readData();
+		return employeePayrollList;
 	}
 }
