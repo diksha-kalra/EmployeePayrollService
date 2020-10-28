@@ -1,6 +1,7 @@
 package com.cg.employeepayroll;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -115,5 +116,24 @@ public class EmployeePayrollDBService {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public List<EmployeePayrollData> getEmployeeForDateRange(LocalDate startDateTime, LocalDate endDateTime) {
+		String sql = String.format("SELECT * FROM employee_payroll where start between '%s' AND '%s';",
+				Date.valueOf(startDateTime), Date.valueOf(endDateTime));
+		return this.getEmployeePayrollDataUsingDB(sql);
+	}
+
+	private List<EmployeePayrollData> getEmployeePayrollDataUsingDB(String sql) {
+		ResultSet result;
+		List<EmployeePayrollData> employeePayrollList = null;
+		try (Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			result = statement.executeQuery(sql);
+			employeePayrollList = this.getEmployeePayrollData(result);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return employeePayrollList;
 	}
 }
