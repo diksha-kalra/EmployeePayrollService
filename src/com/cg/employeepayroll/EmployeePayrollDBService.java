@@ -132,27 +132,6 @@ public class EmployeePayrollDBService {
 		return genderToAverageSalaryMap;
 	}
 
-	public EmployeePayrollData addEmployeeToPayrollUC7(String name, double salary, LocalDate start, char gender) {
-		int employeeId = -1;
-		EmployeePayrollData employeePayrollData = null;
-		String sql = String.format(
-				"INSERT INTO employee_payroll (name,gender,salary,start)" + "VALUES('%s','%s','%s','%s')", name, gender,
-				salary, Date.valueOf(start));
-		try (Connection connection = this.getConnection()) {
-			Statement statement = connection.createStatement();
-			int rowAffected = statement.executeUpdate(sql, statement.RETURN_GENERATED_KEYS);
-			if (rowAffected == 1) {
-				ResultSet result = statement.getGeneratedKeys();
-				if (result.next())
-					employeeId = result.getInt(1);
-			}
-			employeePayrollData = new EmployeePayrollData(employeeId, name, salary, start, gender);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return employeePayrollData;
-	}
-
 	public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate start, char gender) {
 		int employeeId = -1;
 		Connection connection = null;
@@ -191,14 +170,39 @@ public class EmployeePayrollDBService {
 					"INSERT INTO payroll_details (id,basic_pay,deductions,taxable_pay,tax,net_pay)" + ""
 							+ "VALUES('%s','%s','%s','%s','%s','%s')",
 					employeeId, salary, deductions, taxable_pay, tax, net_pay);
-			int rowAffected = statement.executeUpdate(sql);
-			if (rowAffected == 1) {
+			statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		try (Statement statement = connection.createStatement()) {
+			int dept_id = 105;
+			String dept_name = "Finance";
+			String sql = String.format("INSERT INTO department (dept_id,dept_name) VALUES('%s','%s')", dept_id,
+					dept_name);
+			statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try (Statement statement = connection.createStatement()) {
+			int dept_id1 = 105;
+			String sql1 = String.format("INSERT INTO emp_dept (id,dept_id) VALUES('%s','%s')", employeeId, dept_id1);
+			statement.executeUpdate(sql1);
+			int dept_id = 101;
+			String sql = String.format("INSERT INTO emp_dept (id,dept_id) VALUES('%s','%s')", employeeId, dept_id);
+			int rowAffected1 = statement.executeUpdate(sql);
+			if (rowAffected1 == 1) {
 				employeePayrollData = new EmployeePayrollData(employeeId, name, salary, start);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
 				connection.rollback();
+				return employeePayrollData;
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
