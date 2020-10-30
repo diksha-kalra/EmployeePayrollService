@@ -27,7 +27,7 @@ public class EmployeePayrollServiceTest {
 	public void givenEmployeePayrollInDB_WhenRetrieved_ShouldMatchEmployeeCount() {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
-		Assert.assertEquals(5, employeePayrollData.size());
+		Assert.assertEquals(6, employeePayrollData.size());
 	}
 
 	@Test
@@ -48,7 +48,7 @@ public class EmployeePayrollServiceTest {
 		LocalDate endDate = LocalDate.now();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService
 				.readEmployeePayrollForDateRange(IOService.DB_IO, startDate, endDate);
-		Assert.assertEquals(5, employeePayrollData.size());
+		Assert.assertEquals(6, employeePayrollData.size());
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class EmployeePayrollServiceTest {
 		Map<String, Double> genderToAverageSalaryMap = employeePayrollService.getAvgSalary(IOService.DB_IO);
 		Double avgSalaryMale = 3000000.0;
 		Assert.assertEquals(avgSalaryMale, genderToAverageSalaryMap.get("M"));
-		Double avgSalaryFemale = 3000000.0;
+		Double avgSalaryFemale = 3500000.0;
 		Assert.assertEquals(avgSalaryFemale, genderToAverageSalaryMap.get("F"));
 	}
 
