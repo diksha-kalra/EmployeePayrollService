@@ -1,5 +1,6 @@
 package com.cg.employeepayroll;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +64,7 @@ public class EmployeePayrollServiceTest {
 	}
 	
 	@Test
-	public void givenNewEmployee_WhenAdded_ShouldSyncWithDB() {
+	public void givenNewEmployee_WhenAdded_ShouldSyncWithDB() throws PayrollSystemException, SQLException{
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
 		employeePayrollService.addEmployeeToPayroll("mark",5000000.0,LocalDate.now(),'M');
