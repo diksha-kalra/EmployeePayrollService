@@ -132,7 +132,8 @@ public class EmployeePayrollDBService {
 		return genderToAverageSalaryMap;
 	}
 
-	public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate start, char gender) {
+	public EmployeePayrollData addEmployeeToPayroll(String name, double salary, LocalDate start, char gender)
+			throws PayrollSystemException {
 		int employeeId = -1;
 		Connection connection = null;
 		EmployeePayrollData employeePayrollData = null;
@@ -152,11 +153,21 @@ public class EmployeePayrollDBService {
 				if (result.next())
 					employeeId = result.getInt(1);
 			}
+			if (rowAffected == 0)
+				throw new PayrollSystemException("insert into employee table unsuccessful !!!",
+						PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
 		} catch (SQLException e) {
-			e.printStackTrace();
 			try {
 				connection.rollback();
-				return employeePayrollData;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			throw new PayrollSystemException("insert into employee table unsuccessful !!!",
+					PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
+		} catch (PayrollSystemException e) {
+			System.out.println(e);
+			try {
+				connection.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
@@ -170,23 +181,50 @@ public class EmployeePayrollDBService {
 					"INSERT INTO payroll_details (id,basic_pay,deductions,taxable_pay,tax,net_pay)" + ""
 							+ "VALUES('%s','%s','%s','%s','%s','%s')",
 					employeeId, salary, deductions, taxable_pay, tax, net_pay);
-			statement.executeUpdate(sql);
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 0)
+				throw new PayrollSystemException("insert into payroll table unsuccessful !!!",
+						PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
+		} catch (PayrollSystemException e1) {
+			System.out.println(e1);
+			try {
+				connection.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		} catch (SQLException e) {
-			e.printStackTrace();
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			throw new PayrollSystemException("insert into payroll table unsuccessful !!!",
+					PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
 		}
 		try (Statement statement = connection.createStatement()) {
 			int dept_id = 105;
 			String dept_name = "Finance";
 			String sql = String.format("INSERT INTO department (dept_id,dept_name) VALUES('%s','%s')", dept_id,
 					dept_name);
-			statement.executeUpdate(sql);
+			int rowAffected = statement.executeUpdate(sql);
+			if (rowAffected == 0)
+				throw new PayrollSystemException("insert into deptartment table unsuccessful !!!",
+						PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
+		} catch (PayrollSystemException e1) {
+			System.out.println(e1);
+			try {
+				connection.rollback();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		} catch (SQLException e) {
-			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			throw new PayrollSystemException("insert into department table unsuccessful !!!",
+					PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
 		}
 		try (Statement statement = connection.createStatement()) {
 			int dept_id1 = 105;
@@ -198,14 +236,24 @@ public class EmployeePayrollDBService {
 			if (rowAffected1 == 1) {
 				employeePayrollData = new EmployeePayrollData(employeeId, name, salary, start);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+			if (rowAffected1 == 0)
+				throw new PayrollSystemException("insert into emp_dept table unsuccessful !!!",
+						PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
+		} catch (PayrollSystemException e1) {
+			System.out.println(e1);
 			try {
 				connection.rollback();
-				return employeePayrollData;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} catch (SQLException e) {
+			try {
+				connection.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			throw new PayrollSystemException("insert into emp_dept table unsuccessful !!!",
+					PayrollSystemException.ExceptionType.INSERT_EXCEPTION);
 		}
 		try {
 			connection.commit();
