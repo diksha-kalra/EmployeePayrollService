@@ -148,4 +148,10 @@ public class EmployeePayrollDBService {
 		}
 		return genderToAverageSalaryMap;
 	}
+
+	public List<EmployeePayrollData> readActiveEmployeeData() {
+		String sql = "SELECT e.id,e.name,e.start,e.gender,e.salary, d.dept_name from employee_payroll e inner join "
+				+ "emp_dept ed on e.id=ed.id inner join department d on ed.dept_id=d.dept_id where is_active=true; ";
+		return this.getEmployeePayrollDataUsingQuery(sql);
+	}
 }

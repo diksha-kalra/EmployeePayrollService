@@ -70,4 +70,15 @@ public class EmployeePayrollServiceTest {
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("mark");
 		Assert.assertTrue(result);
 	}
+
+	@Test
+	public void givenEmployeeWhenRemoved_ShouldRemainInDatabase() {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readEmployeePayrollData(IOService.DB_IO);
+		int countOfEmployeeRemoved = employeePayrollService.removeEmployeeFromPayroll("mark", IOService.DB_IO);
+		Assert.assertEquals(1, countOfEmployeeRemoved);
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService
+				.readActiveEmployeePayrollData(IOService.DB_IO);
+		Assert.assertEquals(4, employeePayrollData.size());
+	}
 }
