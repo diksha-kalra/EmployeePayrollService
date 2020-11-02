@@ -62,8 +62,10 @@ public class EmployeePayrollService {
 	public long countEntries(IOService fileIo) {
 		if (fileIo.equals(IOService.FILE_IO)) {
 			return new EmployeePayrollFileIOService().countEntries();
+		} else {
+			this.employeePayrollList = employeePayrollDBService.readData();
+			return employeePayrollList.size();
 		}
-		return employeePayrollList.size();
 	}
 
 	public List<EmployeePayrollData> readPayrollData(IOService ioService) {
@@ -144,7 +146,7 @@ public class EmployeePayrollService {
 	}
 
 	public void addEmployeesToPayrollUsingThreads(List<EmployeePayrollData> employeePayrollDataList) {
-		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<Integer, Boolean>();
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<>();
 		employeePayrollDataList.forEach(employeePayrollData -> {
 			Runnable task = () -> {
 				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
@@ -181,5 +183,32 @@ public class EmployeePayrollService {
 		if (ioService.equals(IOService.DB_IO))
 			this.employeePayrollList = employeePayrollDBService.readActiveEmployeeData();
 		return this.employeePayrollList;
+	}
+
+	public void updateEmployeeToPayroll(List<EmployeePayrollData> employeePayrollDataList) {
+		Map<Integer, Boolean> employeeAdditionStatus = new HashMap<Integer, Boolean>();
+		employeePayrollDataList.forEach(employeePayrollData -> {
+			Runnable task = () -> {
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
+				log.info("Employee being updated: " + Thread.currentThread().getName());
+				try {
+					this.updateEmployeeSalary(employeePayrollData.name, employeePayrollData.salary);
+				} catch (PayrollSystemException e) {
+					e.printStackTrace();
+				}
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
+				log.info("Employee updated: " + Thread.currentThread().getName());
+			};
+			Thread thread = new Thread(task, employeePayrollData.name);
+			thread.start();
+		});
+		while (employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+			}
+		}
+		log.info(" " + this.employeePayrollList);
+
 	}
 }
