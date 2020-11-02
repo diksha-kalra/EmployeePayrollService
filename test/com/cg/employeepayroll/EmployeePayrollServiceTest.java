@@ -98,9 +98,9 @@ public class EmployeePayrollServiceTest {
 		employeePayrollService.addEmployeesToPayroll(Arrays.asList(arrayOfEmps));
 		Instant end = Instant.now();
 		log.info("Duration without thread: " + Duration.between(start, end));
-		Instant threadStart=Instant.now();
-		employeePayrollService.addEmployeesToPayrollWith(Arrays.asList(arrayOfEmps));
-		Instant threadEnd=Instant.now();
+		Instant threadStart = Instant.now();
+		employeePayrollService.addEmployeesToPayrollUsingThreads(Arrays.asList(arrayOfEmps));
+		Instant threadEnd = Instant.now();
 		log.info("Duration without thread: " + Duration.between(threadStart, threadEnd));
 		Assert.assertEquals(12, employeePayrollService.countEntries(IOService.DB_IO));
 	}
