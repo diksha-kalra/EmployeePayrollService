@@ -4,8 +4,10 @@ import java.sql.*;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class EmployeePayrollDBService {
+	static Logger log = Logger.getLogger(EmployeePayrollDBService.class.getName());
 	private PreparedStatement employeePayrollDataStatement;
 	private static EmployeePayrollDBService employeePayrollDBService;
 
@@ -24,9 +26,9 @@ public class EmployeePayrollDBService {
 		String userName = "root";
 		String password = "Ikdn@1234";
 		Connection connection;
-		System.out.println("connecting to database: " + jdbcURL);
+		log.info("connecting to database: " + jdbcURL);
 		connection = DriverManager.getConnection(jdbcURL, userName, password);
-		System.out.println("connection successful !!!! " + connection);
+		log.info("connection successful !!!! " + connection);
 		return connection;
 	}
 
@@ -37,12 +39,12 @@ public class EmployeePayrollDBService {
 	}
 
 	private List<EmployeePayrollData> getEmployeePayrollDataUsingQuery(String sql) {
-		List<EmployeePayrollData> employeePayrollList=null;
-		try (Connection connection = EmployeePayrollDBService.getConnection();){
+		List<EmployeePayrollData> employeePayrollList = null;
+		try (Connection connection = EmployeePayrollDBService.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
-			ResultSet result=preparedStatement.executeQuery(sql);
-			employeePayrollList=this.getEmployeePayrollData(result);
-		}catch (SQLException e) {
+			ResultSet result = preparedStatement.executeQuery(sql);
+			employeePayrollList = this.getEmployeePayrollData(result);
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return employeePayrollList;
@@ -82,18 +84,19 @@ public class EmployeePayrollDBService {
 
 	private List<EmployeePayrollData> getEmployeePayrollData(ResultSet result) {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
-		List<String> departmentName=new ArrayList<>();
+		List<String> departmentName = new ArrayList<>();
 		try {
 			while (result.next()) {
 				int id = result.getInt("id");
 				String name = result.getString("name");
 				double Salary = result.getDouble("salary");
 				LocalDate startDate = result.getDate("start").toLocalDate();
-				char gender=result.getString("gender").charAt(0);
-				String dept=result.getString("dept_name");
+				char gender = result.getString("gender").charAt(0);
+				String dept = result.getString("dept_name");
 				departmentName.add(dept);
-				String[] deptArray=new String[departmentName.size()];
-				employeePayrollList.add(new EmployeePayrollData(id, name, Salary, startDate,gender,departmentName.toArray(deptArray)));
+				String[] deptArray = new String[departmentName.size()];
+				employeePayrollList.add(new EmployeePayrollData(id, name, Salary, startDate, gender,
+						departmentName.toArray(deptArray)));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -113,8 +116,9 @@ public class EmployeePayrollDBService {
 	}
 
 	public List<EmployeePayrollData> getEmployeeForDateRange(LocalDate startDateTime, LocalDate endDateTime) {
-		String sql = String.format("SELECT e.id,e.name,e.start,e.gender,e.salary, d.dept_name from employee_payroll e inner join "
-				+ "emp_dept ed on e.id=ed.id inner join department d on ed.dept_id=d.dept_id where start between '%s' AND '%s';",
+		String sql = String.format(
+				"SELECT e.id,e.name,e.start,e.gender,e.salary, d.dept_name from employee_payroll e inner join "
+						+ "emp_dept ed on e.id=ed.id inner join department d on ed.dept_id=d.dept_id where start between '%s' AND '%s';",
 				Date.valueOf(startDateTime), Date.valueOf(endDateTime));
 		return this.getEmployeePayrollDataUsingQuery(sql);
 	}
